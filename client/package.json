@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "ethers": "5.4",
+    "wait": "^0.4.2"
+  }
+}
