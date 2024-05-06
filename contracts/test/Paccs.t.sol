@@ -14,21 +14,30 @@ contract PaccsTest is Test {
     function setUp() public {
         token = new Token("Token", "TOK");
         exchange = new Exchange(address(token));
-        paccs = new Paccs(address(exchange));
+        paccs = new Paccs(address(exchange), address(token));
     }
 
     function test_top_up() public {
-        paccs.topUp{value: 10}(1234);
-        assertEq(paccs.owner_commitment(), 1234);
+        assertEq(paccs.getUserCommitment(address(this)), 0);
+        assertEq(paccs.getUserEtherBalance(address(this)), 0);
+
+        bytes32 com = keccak256(abi.encode(1234));
+        paccs.topUp{value: 10}(com);
+
+        assertEq(paccs.getUserCommitment(address(this)), com);
+        assertEq(paccs.getUserEtherBalance(address(this)), 10);
+
+        // Top up again
+        com = keccak256(abi.encode(5678));
+        paccs.topUp{value: 10}(com);
+        assertEq(paccs.getUserCommitment(address(this)), com);
+        assertEq(paccs.getUserEtherBalance(address(this)), 20);
     }
 
-    function testFail_top_no_funds() public {
-        paccs.topUp(1234);
-    }
-
-    function test_commit_to_action() public {        
-        paccs.commitToAction(1234);
-        assertEq(paccs.tx_commitment(), 1234);
+    function test_commit_to_action() public {   
+        bytes32 com = keccak256(abi.encode(5678));     
+        paccs.commitToAction(1234, com);
+        assertEq(paccs.tx_commitments(1234), com);
     }
 
     function test_buyTokens() public {
@@ -40,11 +49,18 @@ contract PaccsTest is Test {
     }
 
     function test_orderAction() public {
-        token.transfer(address(exchange), 10000);
-        hoax(address(paccs), 10000 ether);
+        token.transfer(address(exchange), 10);
+        bytes32 com = keccak256(abi.encode(1234, 5678));
+        paccs.topUp{value: 10}(com);
+
+        bytes32 com_action = keccak256(abi.encode(1234, 5678, 10));     
+        paccs.commitToAction(1234, com_action);
         
-        uint balance = token.balanceOf(address(paccs));
-        paccs.orderAction(10);
-        assertEq(balance + 10, token.balanceOf(address(paccs)));
+        bytes32 new_com = keccak256(abi.encode(1234, 5678));
+        paccs.orderAction(1234, 5678, 10, new_com);
+
+        assertEq(token.balanceOf(address(paccs)), 10);
+        assertEq(paccs.getUserEtherBalance(address(this)), 0);
+        assertEq(paccs.getUserTokBalance(address(this)), 10);
     }
 }
