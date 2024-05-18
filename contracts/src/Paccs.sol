@@ -80,14 +80,14 @@ contract Paccs {
         tx_commitments[s] = tx_commitment;
     }
 
-    function orderAction(uint256 s, uint256 r, uint256 amountToBuy, bytes32 commitment) public {
-        require(users[msg.sender].ether_balance >= amountToBuy, "Not enough Ether to order the action.");
+    function orderAction(uint256 s, uint256 r, uint _amountToBuy, bytes32 commitment) public {
+        require(users[msg.sender].ether_balance >= _amountToBuy, "Not enough Ether to order the action.");
         require(users[msg.sender].commitment == keccak256(abi.encode(s, r)), "Provided opening not correct.");
-        require(tx_commitments[s] == keccak256(abi.encode(s, r, amountToBuy)), "Transaction was never committed.");
+        require(tx_commitments[s] == keccak256(abi.encode(s, r, _amountToBuy)), "Transaction was never committed.");
         
-        users[msg.sender].ether_balance -= amountToBuy;
-        exchange.buyTokens{value: amountToBuy}();
-        users[msg.sender].tok_balance += amountToBuy;
+        users[msg.sender].ether_balance -= _amountToBuy;
+        exchange.buyTokens{value: _amountToBuy}();
+        users[msg.sender].tok_balance += _amountToBuy;
 
         if(users[msg.sender].ether_balance > collateral) {
             users[msg.sender].commitment = commitment;
