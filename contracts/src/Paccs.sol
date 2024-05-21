@@ -27,21 +27,22 @@ contract Paccs {
 
     function withdraw_ether(uint _amount, uint256 s, uint256 r, bytes32 commitment) external {
         require(users[msg.sender].ether_balance >= _amount, "Not enough balance.");
-        require(users[msg.sender].commitment == keccak256(abi.encode(s, r)), "Provided opening not correct.");
+        require(users[msg.sender].commitment == keccak256(abi.encode(s, r)) || users[msg.sender].commitment == 0, "Provided opening not correct.");
         require(tx_commitments[s] == 0, "An existing committed transaction was never issued.");
 
-        users[msg.sender].commitment = commitment;
+        if(users[msg.sender].ether_balance > collateral) {
+            users[msg.sender].commitment = commitment;
+        }
+        else {
+            users[msg.sender].commitment = 0;
+        }
 
+        users[msg.sender].ether_balance -= _amount;
         payable(msg.sender).transfer(_amount);
     }
 
-    function withdraw_token(uint _amount, uint256 s, uint256 r, bytes32 commitment) external {
-        require(users[msg.sender].tok_balance >= _amount, "Not enough balance.");
-        require(users[msg.sender].commitment == keccak256(abi.encode(s, r)), "Provided opening not correct.");
-        require(tx_commitments[s] == 0, "An existing committed transaction was never issued.");
-
-        users[msg.sender].commitment = commitment;
-
+    function withdraw_token(uint _amount) external {
+        users[msg.sender].tok_balance -= _amount;
         token.transfer(msg.sender, _amount);
     }
 
@@ -68,7 +69,7 @@ contract Paccs {
     function topUp(bytes32 commitment) public payable {
         users[msg.sender].ether_balance += msg.value;
 
-        if(users[msg.sender].ether_balance > collateral) {
+        if(users[msg.sender].ether_balance > collateral && users[msg.sender].commitment == 0) {
             users[msg.sender].commitment = commitment;
         }
     }
@@ -95,5 +96,7 @@ contract Paccs {
         else {
             users[msg.sender].commitment = 0;
         }
+
+        tx_commitments[s] = 0;
     }
 }
