@@ -5,39 +5,44 @@ import "forge-std/Test.sol";
 import "src/Paccs.sol";
 import "src/Exchange.sol";
 import "src/Token.sol";
+import "../src/poseidon-solidity/contracts/PoseidonT3.sol";
+import "../src/poseidon-solidity/contracts/PoseidonT4.sol";
 
 contract PaccsTest is Test {
     Token public token;
     Exchange public exchange;
     Paccs public paccs;
-    
+
+    using PoseidonT3 for uint256[2];
+    using PoseidonT4 for uint256[3];
+        
     function setUp() public {
         token = new Token("Token", "TOK");
         exchange = new Exchange(address(token));
         paccs = new Paccs(address(exchange), address(token));
     }
-
+    
     function test_top_up() public {
         assertEq(paccs.getUserCommitment(address(this)), 0);
         assertEq(paccs.getUserEtherBalance(address(this)), 0);
 
-        bytes32 com = keccak256(abi.encode(1234));
+        uint com = [uint256(12), uint256(34)].hash();
         paccs.topUp{value: 10}(com);
 
         assertEq(paccs.getUserCommitment(address(this)), com);
         assertEq(paccs.getUserEtherBalance(address(this)), 10);
 
-        // Top up again
-        com = keccak256(abi.encode(5678));
-        paccs.topUp{value: 10}(com);
+        // Top up again, check that commitment doesn't change
+        uint com_t = [uint256(56), uint256(78)].hash();
+        paccs.topUp{value: 10}(com_t);
         assertEq(paccs.getUserCommitment(address(this)), com);
         assertEq(paccs.getUserEtherBalance(address(this)), 20);
     }
 
     function test_commit_to_action() public {   
-        bytes32 com = keccak256(abi.encode(5678));     
-        paccs.commitToAction(1234, com);
-        assertEq(paccs.tx_commitments(1234), com);
+        uint com = [uint256(12), uint256(34), uint256(10)].hash();   
+        paccs.commitToAction(12, com);
+        assertEq(paccs.tx_commitments(12), com);
     }
 
     function test_buyTokens() public {
@@ -50,14 +55,14 @@ contract PaccsTest is Test {
 
     function test_orderAction() public {
         token.transfer(address(exchange), 10);
-        bytes32 com = keccak256(abi.encode(1234, 5678));
+        uint com = [uint256(12), uint256(34)].hash();
         paccs.topUp{value: 10}(com);
 
-        bytes32 com_action = keccak256(abi.encode(1234, 5678, 10));     
-        paccs.commitToAction(1234, com_action);
+        uint com_action = [uint256(12), uint256(34), uint256(10)].hash();
+        paccs.commitToAction(12, com_action);
         
-        bytes32 new_com = keccak256(abi.encode(1234, 5678));
-        paccs.orderAction(1234, 5678, 10, new_com);
+        uint new_com = [uint256(56), uint256(78)].hash();
+        paccs.orderAction(12, 34, 10, new_com);
 
         assertEq(token.balanceOf(address(paccs)), 10);
         assertEq(paccs.getUserEtherBalance(address(this)), 0);
