@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "circomlibjs": "^0.1.7",
     "ethers": "5.4",
     "wait": "^0.4.2"
   }

@@ -1,6 +1,6 @@
 # Client 
 
-This folder contains the client.
+This folder contains the client that interacts with the contract. By default it uses a local devnet, that you can set up, and deploy the PACCs contracts on it, by following the instructions in the `contracts` folder.
 
 ## Prerequisities
 
