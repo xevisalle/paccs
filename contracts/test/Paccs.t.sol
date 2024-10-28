@@ -32,7 +32,7 @@ contract PaccsTest is Test {
         assertEq(paccs.getUserCommitment(address(this)), com);
         assertEq(paccs.getUserEtherBalance(address(this)), 10);
 
-        // Top up again
+        // Top up again, check that commitment doesn't change
         uint com_t = [uint256(56), uint256(78)].hash();
         paccs.topUp{value: 10}(com_t);
         assertEq(paccs.getUserCommitment(address(this)), com);
@@ -40,7 +40,7 @@ contract PaccsTest is Test {
     }
 
     function test_commit_to_action() public {   
-        uint com = [uint256(56), uint256(78)].hash();   
+        uint com = [uint256(12), uint256(34), uint256(10)].hash();   
         paccs.commitToAction(12, com);
         assertEq(paccs.tx_commitments(12), com);
     }

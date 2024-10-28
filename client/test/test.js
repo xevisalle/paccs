@@ -17,7 +17,6 @@ const PACCS_ABI = JSON.parse(fs.readFileSync("../contracts/out/Paccs.sol/Paccs.j
 
 // Set owner wallet
 const provider = new ethers.providers.JsonRpcProvider();
-const abiCoder = new ethers.utils.AbiCoder();
 const wallet = new ethers.Wallet(OWNER_SK, provider);
 
 // Set the contracts
@@ -34,16 +33,17 @@ describe('PACCs JS Testing Suite', function () {
         let balance = await token_contract.balanceOf(EXCHANGE_ADDRESS);
 
         // top up the user smart wallet
-        let com = poseidon.F.toObject(poseidon([1234, 5678]));
+        let com = poseidon.F.toObject(poseidon([12, 34]));
         await paccs_contract.topUp(com, {value: 10});
 
         // commit to a certain action
-        let com_action = poseidon.F.toObject(poseidon([1234, 5678, 10])); 
-        await paccs_contract.commitToAction(1234, com_action);
+        let com_action = poseidon.F.toObject(poseidon([12, 34, 10])); 
+        await paccs_contract.commitToAction(12, com_action);
 
-        // order the committed action
-        let new_com = poseidon.F.toObject(poseidon([1234, 5678]));
-        await paccs_contract.orderAction(1234, 5678, 10, new_com);
+        // order the committed action (the commitment will be 0 in-contract
+        // since the amount will be 0 again)
+        let new_com = poseidon.F.toObject(poseidon([56, 78]));
+        await paccs_contract.orderAction(12, 34, 10, new_com);
 
         // assert if balance is correct
         new_balance = await token_contract.balanceOf(EXCHANGE_ADDRESS);
