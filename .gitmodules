@@ -1,0 +1,3 @@
+[submodule "contracts/src/poseidon-solidity"]
+	path = contracts/src/poseidon-solidity
+	url = https://github.com/chancehudson/poseidon-solidity

@@ -11,6 +11,12 @@ forge install foundry-rs/forge-std --no-git
 forge install openzeppelin/openzeppelin-contracts --no-git
 ```
 
+You will also need to download the submodules:
+
+```
+git submodule update --init
+```
+
 ## Usage
 
 Our code contains three contracts: the *Token* contract that deploys an ERC-20 token, the *Exchange* contract that deploys a DEX application, and the *Paccs* contract being our protocol's smart contract. You can test them by running:

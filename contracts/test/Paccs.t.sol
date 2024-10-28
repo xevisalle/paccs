@@ -16,7 +16,7 @@ contract PaccsTest is Test {
         exchange = new Exchange(address(token));
         paccs = new Paccs(address(exchange), address(token));
     }
-
+    
     function test_top_up() public {
         assertEq(paccs.getUserCommitment(address(this)), 0);
         assertEq(paccs.getUserEtherBalance(address(this)), 0);
@@ -28,8 +28,8 @@ contract PaccsTest is Test {
         assertEq(paccs.getUserEtherBalance(address(this)), 10);
 
         // Top up again
-        com = keccak256(abi.encode(5678));
-        paccs.topUp{value: 10}(com);
+        bytes32 com_t = keccak256(abi.encode(5678));
+        paccs.topUp{value: 10}(com_t);
         assertEq(paccs.getUserCommitment(address(this)), com);
         assertEq(paccs.getUserEtherBalance(address(this)), 20);
     }
