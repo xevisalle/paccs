@@ -1,2 +1,8 @@
 node_modules/
 package-lock.json
+*.r1cs
+downloaded_power_*
+*.ptau
+verification_key.json
+*.zkey
+circuit_js/
