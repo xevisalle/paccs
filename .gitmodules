@@ -1,3 +1,6 @@
 [submodule "contracts/src/poseidon-solidity"]
 	path = contracts/src/poseidon-solidity
 	url = https://github.com/chancehudson/poseidon-solidity
+[submodule "client/src/circomlib"]
+	path = client/src/circomlib
+	url = https://github.com/iden3/circomlib
