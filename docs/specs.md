@@ -17,3 +17,44 @@ Private, Anonymous, Collaterizable Commitments (PACCs) is a protocol to prevent 
 - **(PACCs contract) unlock_collateral ($ptx_3$)**: if everything worked with no aborts, the collateral gets unlocked by removing the restriction.
   
 - **(PACCs contract) execute_action ($ptx_3$)**: if the received order was indeed committed previously (i.e. the transaction itself is correct), the action is executed by calling the DApp. Plus, the commitment stored in the PACCs contract state gets replaced by the new one (or the existing one gets deleted if not enough funds remain to perform a new exchange).
+
+![alt text](images/protocol.png "Protocol")
+
+## Cryptographic Primitives
+
+We use different cryptographic primitive and specific implementations in our PoC. We summarize the most important ones here:
+
+- Plonk: this is the ZKP scheme used to prove the commitment to the relayer. The particular implementation we used is the one from **snarkjs**, along with the **circom** tool to write the circuit used in our protocol.
+- Poseidon: this is the hash function used as a commitment scheme. It has been chosen due to its efficiency when computed in-circuit, and its integration with the **circom**.
+
+## PoC Modules
+
+Now we give an overview on the implemented modules.
+
+### Contracts
+
+The smart contracts involved in the PACCs protocol. Into the module, you can find the following Solidity contracts:
+
+- **Exchange.sol:*** a basic sample contract simulating a DeX. It holds a custom token called TOK, that can be exchanged by Ether.
+- **Paccs.sol:*** the core contract of our protocol. It is basically a SCW, that allows users to store their money in there, and perform the exchange of TOK by means of our MEV-secure protocol.
+- **Token.sol:** a basic sample contract deploying the TOK ERC20 token.
+
+Additionally, our code also depends on the external library contracts **PoseidonT3.sol** and **PoseidonT4.sol** to use the Poseidon hash function in-contract.
+
+You can find an explanation on how to test and deploy the contracts using a development network in the module's README.
+
+### Client
+
+The module used to interact with the contracts, once deployed on a Ethereum devnet. It also contains the tools required for the communication between a user and a relayer. It has been coded in Javascript using Node, so it is easy portable to webapps. It allows users to tansfer money, top up the SCW, and order actions, among other features. It also allows relayers to forward users' commitments.
+
+Furthermore, it includes the circom circuit to allow users to compute the ZKPs for the relayers, and for the relayers to verify them.
+
+You can find an explanation on how to compile the circuit, and how to test the overall code in the module's README.
+
+### Zkp
+
+This module contains the circuit used in the PACCs protocol, but implemented using the `dusk-plonk` Rust implementation of Plonk. It doesn't integrate with the rest of our stack, we provide it just for the sake of benchmarking.
+
+## Other Considerations and Conclusions
+
+TBC
