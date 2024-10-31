@@ -24,8 +24,8 @@ Private, Anonymous, Collaterizable Commitments (PACCs) is a protocol to prevent 
 
 We use different cryptographic primitive and specific implementations in our PoC. We summarize the most important ones here:
 
-- Plonk: this is the ZKP scheme used to prove the commitment to the relayer. The particular implementation we used is the one from **snarkjs**, along with the **circom** tool to write the circuit used in our protocol.
-- Poseidon: this is the hash function used as a commitment scheme. It has been chosen due to its efficiency when computed in-circuit, and its integration with the **circom**.
+- [**Plonk:**](https://eprint.iacr.org/2019/953.pdf) this is the ZKP scheme used to prove the commitment to the relayer. The particular implementation we used is the one from [**snarkjs**](https://github.com/iden3/snarkjs), along with the [**circom**](https://docs.circom.io) tool to write the circuit used in our protocol. Plonk has been chosen due to it being universal: a same trusted setup can be used in any circuit. Plus, it is also updatable: anyone can provide randmoness to the setup.
+- [**Poseidon:**](https://eprint.iacr.org/2019/458.pdf) this is the hash function used as a commitment scheme. It has been chosen due to its efficiency when computed in-circuit, and its integration with **circom**.
 
 ## PoC Modules
 
@@ -35,8 +35,8 @@ Now we give an overview on the implemented modules.
 
 The smart contracts involved in the PACCs protocol. Into the module, you can find the following Solidity contracts:
 
-- **Exchange.sol:*** a basic sample contract simulating a DeX. It holds a custom token called TOK, that can be exchanged by Ether.
-- **Paccs.sol:*** the core contract of our protocol. It is basically a SCW, that allows users to store their money in there, and perform the exchange of TOK by means of our MEV-secure protocol.
+- **Exchange.sol:** a basic sample contract simulating a DeX. It holds a custom token called TOK, that can be exchanged by Ether.
+- **Paccs.sol:** the core contract of our protocol. It is basically a SCW, that allows users to store their money in there, and perform the exchange of TOK by means of our MEV-secure protocol.
 - **Token.sol:** a basic sample contract deploying the TOK ERC20 token.
 
 Additionally, our code also depends on the external library contracts **PoseidonT3.sol** and **PoseidonT4.sol** to use the Poseidon hash function in-contract.
@@ -57,4 +57,8 @@ This module contains the circuit used in the PACCs protocol, but implemented usi
 
 ## Other Considerations and Conclusions
 
-TBC
+The code in this repository is currently unstable. Furthermore, it has not gone through an exhaustive security analysis, so it is not intended to be used in a production environment, only for academic purposes. 
+
+In order to deploy and integrate our solution into a specific application (e.g. a webapp allowing to perform token exchanges), it is first required to deploy the contract on an Ethereum network, for instance, a local devnet or a public testnet. Next, the webapp can be built following the code written in the tests of our **client**, which will interact with the PACCs contract. In the same way, the communication between the user and the relayer can be implemented by means of the code found in our client (i.e. the code to generate and verify proofs).
+
+At the moment, the code uses Merkle trees of depth 4 for testing purposes, this needs to be updated according to the needs of the final application. Likewise, some parameters like the collateral amount need to be updated in the contract.
