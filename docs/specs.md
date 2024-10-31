@@ -1,5 +1,7 @@
 # PACCs PoC Implementation Specification
 
+Specification referring to the commit: [ca9a4dfccb136334863bcea5c98fe9536e40cf2b](https://github.com/xevisalle/paccs/commit/ca9a4dfccb136334863bcea5c98fe9536e40cf2b)
+
 ## Protocol Overview
 
 Private, Anonymous, Collaterizable Commitments (PACCs) is a protocol to prevent maximal-extractable value (MEV) attacks in Decentralized Finance (DeFi). It is a commitment protocol based on smart contract wallets (SCWs) and Zero-Knowledge Proofs (ZKPs), that can be used to convince a relaying party that the user generating the PACC proof has enough funds to pay the required fees, that its wallet is committed to perform certain actions, and that the wallet loses some amount of collateral if this commitment is broken. Our PACCs proof-of-concept implementation, takes as an example the scenario where a user owning an External Owned Account (EOA) on Ethereum, is willing to perform a token exchange by means of the PACCs protocol, thus preventing any kind of MEV attack. We have three actors: the user willing to perform the exchange, a relaying party that forwards users' commitments to perform certain actions, the PACCs contract, and the DApp (in our PoC, a Decentralized Exchange (Dex)). The action can be performed by means of three transactions $(ptx_1, ptx_2, ptx_3)$. A simplified high-level overview of the protocol steps, for the sake of completeness, is as follows (and depicted in the following figure):
